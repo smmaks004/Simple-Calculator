@@ -3,8 +3,6 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import * 
 from PySide6.QtCore import * 
 
-from decimal import getcontext
-
 import keyboard
 
 class Calculator(QMainWindow):
@@ -12,22 +10,22 @@ class Calculator(QMainWindow):
         super().__init__()
         self.setWindowTitle("Calculator")
         self.setGeometry(100, 100, 400, 500)
-        getcontext().prec = 12 # 
         
         self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
+        self.setCentralWidget(self.central_widget) 
         
         self.layout = QVBoxLayout()
         self.central_widget.setLayout(self.layout)
         
         self.result_display = QLineEdit()
-        self.result_display.setReadOnly(True)
-        self.result_display.setAlignment(Qt.AlignRight)
-        self.result_display.setFixedHeight(70)
+        self.result_display.setReadOnly(True) # Make read-only
+        self.result_display.setAlignment(Qt.AlignRight) # Align text to right
+        self.result_display.setFixedHeight(70) # Set fixed height
         self.result_display.setStyleSheet("font-size: 32px;")
         self.layout.addWidget(self.result_display)
         
-        self.buttons = [
+        # Button layout
+        self.buttons = [    
             ['+/-', 'C', '⌫'],
             ['x²', '√', '1/x', '/'],
             ['7', '8', '9', '*'],
@@ -41,31 +39,29 @@ class Calculator(QMainWindow):
         
         self.button_map = {}
         
-        for row, button_row in enumerate(self.buttons):
-            for col, button_text in enumerate(button_row):
+        for row, button_row in enumerate(self.buttons): # row index, button row
+            for col, button_text in enumerate(button_row): # column index, button text
                 button = QPushButton(button_text)
-                button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+                button.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding) # Set button size policy
                 button.setStyleSheet("font-size: 24px;")
-                if button_text == "⌫":
+                if button_text == "⌫": # wide backspace block
                     self.button_layout.addWidget(button, row, col, 1, 2)
-                    # button.setStyleSheet("color:red;")
-                elif button_text == "=":
+                elif button_text == "=": # wide "=" block
                     self.button_layout.addWidget(button, row, col, 1, 2)
-                    # button.setStyleSheet("color:red;")
                 else:
-                    # Shift columns if "⌫" button is found in the row
-                    col_offset = 1 if col > 0 and self.buttons[row][col - 1] == "⌫" else 0
+                    col_offset = 1 if col > 0 and self.buttons[row][col - 1] == "⌫" else 0 # Shift columns if "⌫" button is found in the row
                     self.button_layout.addWidget(button, row, col + col_offset)
                 
-                button.clicked.connect(self.on_button_clicked)
-                self.button_map[button_text] = button
+                button.clicked.connect(self.on_button_clicked) # Connect button click event to on_button_clicked method
+                self.button_map[button_text] = button 
         
         self.current_expression = ""
         
-        self.setup_key_bindings()
+        self.setup_key_bindings() # Set up key bindings
     
-    def setup_key_bindings(self):
-        key_map = {
+    # Set up key bindings
+    def setup_key_bindings(self): 
+        key_map = { # Key mapping
             '1': '1', '2': '2', '3': '3', 
             '4': '4', '5': '5', '6': '6', 
             '7': '7', '8': '8', '9': '9', 
@@ -75,10 +71,12 @@ class Calculator(QMainWindow):
             'backspace': '⌫'
         }
         
-        for key, button_text in key_map.items():
-            keyboard.on_press_key(key, lambda e, bt = button_text: self.button_map[bt].click())
+        # Bind key press event to button click event
+        for key, button_text in key_map.items(): 
+            keyboard.on_press_key(key, lambda e, bt = button_text: self.button_map[bt].click()) 
     
-    def on_button_clicked(self):
+    # Button click event handler
+    def on_button_clicked(self): 
         button = self.sender()
         text = button.text()
         
@@ -96,7 +94,7 @@ class Calculator(QMainWindow):
         elif text == "⌫":
             self.current_expression = self.current_expression[:-1]
             self.result_display.setText(self.current_expression)
-        elif text == "+/-":
+        elif text == "+/-": 
             if self.current_expression:
                 if self.current_expression[0] == '-':
                     self.current_expression = self.current_expression[1:]
